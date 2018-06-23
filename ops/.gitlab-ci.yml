@@ -15,10 +15,61 @@
   - branches
   when: on_success
 
-include:
-- /templates/job_publish.yml
-- /templates/job_deploy.yml
-- /templates/job_lint.yml
+.job_template_publish: &job_publish
+  type: publish
+  script:
+  # Install tool
+  - apk add --no-cache git openssl
+
+  # install Helm
+  - wget https://kubernetes-helm.storage.googleapis.com/helm-$HELM_VERSION-linux-amd64.tar.gz
+  - tar -xvf helm-$HELM_VERSION-linux-amd64.tar.gz
+  - mv linux-amd64/helm /usr/local/bin/helm
+  - helm init -c
+
+  # update charts
+  - git clone https://$GITHUB_USER:$GITHUB_PASSWORD@github.com/micro-company/charts.git
+  - helm package $HELM_PATH
+  - mv *.tgz charts/docs
+  - helm repo index charts/docs
+  - cd charts
+  - git add .
+  - git config --global user.email "authmicroservice@gmail.com"
+  - git config --global user.name "CI bot"
+  - git commit -m "Add/Update chart $CI_PROJECT_NAME:$CI_COMMIT_TAG"
+  - git push
+  except:
+  - branches
+  when: on_success
+
+.job_template_deploy: &job_deploy
+  type: deploy
+  before_script:
+  - export DEPLOYS=$(helm --kube-context $KUBE_CONTEXT ls | grep $RELEASE_NAME | wc -l)
+  - helm repo add micro-company https://micro-company.github.io/charts/
+  - helm repo update
+  script:
+  - if [ ${DEPLOYS}  -eq 0 ]; then
+      helm --kube-context $KUBE_CONTEXT install
+        --name $RELEASE_NAME
+        --namespace=$CI_PROJECT_NAMESPACE
+        --set CI_PROJECT_NAME=$CI_PROJECT_NAME
+        --set CI_PIPELINE_ID=$CI_PIPELINE_ID
+        --set CI_BUILD_ID=$CI_BUILD_ID
+        --set image.tag=$CI_COMMIT_TAG
+        --set CI_COMMIT_SHA=$CI_COMMIT_SHA
+        micro-company/$RELEASE_NAME;
+    else
+      helm --kube-context $KUBE_CONTEXT upgrade $RELEASE_NAME micro-company/$RELEASE_NAME
+        --namespace=$CI_PROJECT_NAMESPACE
+        --set CI_PROJECT_NAME=$CI_PROJECT_NAME
+        --set CI_PIPELINE_ID=$CI_PIPELINE_ID
+        --set CI_BUILD_ID=$CI_BUILD_ID
+        --set image.tag=$CI_COMMIT_TAG
+        --set CI_COMMIT_SHA=$CI_COMMIT_SHA;
+    fi
+  except:
+  - branches
 
 image: docker:latest
 services:
