@@ -1,7 +1,7 @@
 include:
-- ./templates/job_publish.yml
-- ./templates/job_deploy.yml
-- ./templates/job_lint.yml
+- './templates/job_publish.yml'
+- './templates/job_deploy.yml'
+- './templates/job_lint.yml'
 
 image: docker:latest
 services:
