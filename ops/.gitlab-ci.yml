@@ -1,16 +1,27 @@
-include: templates/job_deploy
+include:
+- templates/job_deploy
+- templates/job_deploy
+
+image: docker:latest
+services:
+- docker:dind
 
 variables:
   RELEASE_NAME: ingress
   HELM_PATH: ops/Helm
   KUBE_CONTEXT: minikube
+  HELM_VERSION: v2.7.2
 
 stages:
+- publish
 - deploy
+
+chart:staging:
+  <<: *job_publish
+  only:
+  - /^(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)-rc(?:0|[1-9]\d*)$/
 
 deploy:staging:
   <<: *job_deploy
-  environment:
-    name: staging
   only:
-  - /^(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.?(?:0|[1-9]\d*)?$/
+  - /^(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)-rc(?:0|[1-9]\d*)$/
