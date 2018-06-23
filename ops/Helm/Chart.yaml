@@ -1,0 +1,12 @@
+name: Ingress
+version: 0.1.0
+description: Ingress instance
+keywords:
+- ingress
+home: https://github.com/micro-company/Ingress
+sources:
+- https://github.com/micro-company/Ingress
+maintainers:
+- email: batazor111@gmail.com
+  name: Login Victor
+engine: gotpl

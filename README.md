@@ -1,2 +1,9 @@
 # Ingress
-Gateway
+
+Gateway service
+
+### Environment variables
+
+| Name                | Default                   |
+|---------------------|---------------------------|
+| host.main           | -                         |

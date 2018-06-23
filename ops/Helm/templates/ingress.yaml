@@ -1,0 +1,36 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: {{ .Values.CI_PROJECT_NAME }}
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    # kubernetes.io/tls-acme: 'true'
+    ingress.kubernetes.io/rewrite-target: /
+    ingress.kubernetes.io/ssl-redirect: "true"
+    ingress.kubernetes.io/proxy-body-size: 8m
+  labels:
+    app: {{ .Values.CI_PROJECT_NAME }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    heritage: "{{ .Release.Service }}"
+    release: "{{ .Release.Name }}"
+    pipeline_id: "{{ .Values.CI_PIPELINE_ID }}"
+    build_id: "{{ .Values.CI_BUILD_ID }}"
+    commit_sha: "{{ .Values.CI_COMMIT_SHA }}"
+    component: ingress
+spec:
+  tls:
+  - hosts:
+    - {{ .Values.host.main }}
+    secretName: {{ .Values.CI_PROJECT_NAME }}-tls
+  rules:
+  - host: {{ .Values.host.main }}
+    http:
+      paths:
+      - path: /api/*
+        backend:
+          serviceName: api
+          servicePort: 4070
+      - path: /*
+        backend:
+          serviceName: frontend
+          servicePort: 80

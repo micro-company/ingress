@@ -1,0 +1,16 @@
+include: templates/job_deploy
+
+variables:
+  RELEASE_NAME: ingress
+  HELM_PATH: ops/Helm
+  KUBE_CONTEXT: minikube
+
+stages:
+- deploy
+
+deploy:staging:
+  <<: *job_deploy
+  environment:
+    name: staging
+  only:
+  - /^(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.?(?:0|[1-9]\d*)?$/
