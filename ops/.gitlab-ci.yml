@@ -18,7 +18,7 @@ stages:
 - publish
 - deploy
 
-chart:staging:
+lint:
   type: best_practices
   <<: *job_lint
 
