@@ -1,4 +1,4 @@
-.job_template_publish: &job_publish
+.job_template_lint: &job_lint
   script:
   # Install tool
   - apk add --no-cache git openssl
