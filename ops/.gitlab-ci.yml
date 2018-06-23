@@ -1,6 +1,7 @@
 include:
+- templates/job_publish
 - templates/job_deploy
-- templates/job_deploy
+- templates/job_lint
 
 image: docker:latest
 services:
@@ -8,13 +9,18 @@ services:
 
 variables:
   RELEASE_NAME: ingress
-  HELM_PATH: ops/Helm
-  KUBE_CONTEXT: minikube
+  HELM_PATH: ops/Helm/ingress
   HELM_VERSION: v2.7.2
+  KUBE_CONTEXT: minikube
 
 stages:
+- best_practices
 - publish
 - deploy
+
+chart:staging:
+  type: best_practices
+  <<: *job_lint
 
 chart:staging:
   <<: *job_publish

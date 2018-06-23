@@ -1,9 +1,10 @@
-name: Ingress
+name: ingress
 version: 0.1.0
 description: Ingress instance
 keywords:
 - ingress
 home: https://github.com/micro-company/Ingress
+icon: https://avatars2.githubusercontent.com/u/25286264?s=400&u=5b2ecd16555a11be004aed34f69fde7c0acaea53&v=4
 sources:
 - https://github.com/micro-company/Ingress
 maintainers:

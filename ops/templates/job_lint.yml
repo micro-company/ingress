@@ -1,0 +1,16 @@
+.job_template_publish: &job_publish
+  script:
+  # Install tool
+  - apk add --no-cache git openssl
+
+  # install Helm
+  - wget https://kubernetes-helm.storage.googleapis.com/helm-$HELM_VERSION-linux-amd64.tar.gz
+  - tar -xvf helm-$HELM_VERSION-linux-amd64.tar.gz
+  - mv linux-amd64/helm /usr/local/bin/helm
+  - helm init -c
+
+  # update charts
+  - helm lint $HELM_PATH
+  except:
+  - branches
+  when: on_success
